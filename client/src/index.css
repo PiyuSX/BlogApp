@@ -1,1 +1,209 @@
 @import "tailwindcss";
+
+.hamburger {
+    background-color: rgba(41, 49, 157, 0.742);
+    backdrop-filter: blur(1px);
+}
+
+
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+
+ /* Styles  */
+
+ :root{
+  --bg: #ebf0ff;
+  --panel-bg: #ffffff;
+  --text: #1b1f2a;
+  --muted: #7a8194;
+  --primary-1: #6a35ff;
+  --primary-3: #9747ff;
+  --radius-lg: 28px;
+  --shadow: 0 10px 30px rgba(22, 20, 60, .12), 0 2px 6px rgba(22, 20, 60, .06);
+  --easing: cubic-bezier(.2, .8, .2, 1);
+  --overlay-curve-login: 64px 24px 64px 240px;
+  --overlay-curve-signup: 240px 64px 24px 64px;
+}
+
+/* Page background */
+.page{
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(1200px 500px at 15% -10%, rgba(151,71,255,.18), transparent 60%),
+    radial-gradient(1200px 500px at 85% 110%, rgba(106,53,255,.18), transparent 60%),
+    var(--bg);
+}
+
+/* Main auth shell */
+.auth{
+  position: relative;
+  width: min(980px, 94vw);
+  height: 600px;
+  background: var(--panel-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  isolation: isolate; /* keeps overlay shadow/blur inside */
+}
+
+/* Two form panes (your Login and Signup components render inside) */
+.form-pane{
+  position: absolute;
+  top: 0;
+  bottom: 0;          /* Important: no left/right here; variants set them */
+  display: grid;
+  align-content: center;
+  padding: 48px 64px;
+  width: 50%;
+  gap: 18px;
+  transition: opacity .5s var(--easing), transform .6s var(--easing);
+}
+
+/* Placeholders: feel free to remove if your components handle their own headings */
+.form-pane h1, .form-pane h2, .form-pane p { margin: 0 0 10px; }
+
+/* Position sign-in on the left, sign-up on the right. */
+.form-pane--signin{ left: 0; }
+.form-pane--signup{ right: 0; }
+
+/* Initial state = Sign In active */
+.form-pane--signin{ opacity: 1; transform: translateX(0); pointer-events: auto; }
+.form-pane--signup{ opacity: 0; transform: translateX(20px); pointer-events: none; }
+
+/* When toggled to sign-up */
+.auth.is-signup .form-pane--signin{
+  opacity: 0;
+  transform: translateX(-20px);
+  pointer-events: none;
+}
+.auth.is-signup .form-pane--signup{
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Buttons (if your Login/Signup don't style theirs) */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  border: 0;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+.btn-ghost{
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,.7);
+  height: 50px;
+  padding: 0 28px;
+  border-radius: 14px;
+  backdrop-filter: blur(1px);
+}
+
+/* The single sliding purple overlay */
+.overlay{
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(0);
+  transition: transform .7s var(--easing), border-radius .7s var(--easing);
+  z-index: 2;
+  color: #fff;
+
+  background: linear-gradient(135deg, var(--primary-3), var(--primary-1));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  border-radius: var(--overlay-curve-login);
+}
+
+/* Move overlay to the left on sign-up and flip the curve */
+.auth.is-signup .overlay{
+  transform: translateX(-100%);
+  border-radius: var(--overlay-curve-signup);
+}
+
+/* Overlay content panels (text + toggle buttons) */
+.overlay__panel{
+  position: absolute;
+  inset: 0;
+  padding: 48px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  gap: 16px;
+}
+.overlay__panel h2{
+  margin: 0;
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+.overlay__panel p{
+  margin: 0;
+  max-width: 360px;
+  color: rgba(255,255,255,.9);
+}
+
+/* Only show the edge's corresponding content */
+.overlay__panel--right{ transform: translateX(0); opacity: 1; transition: opacity .4s var(--easing) .1s; }
+.overlay__panel--left { transform: translateX(-100%); opacity: 0; transition: opacity .4s var(--easing) .1s; }
+
+/* When moved left, flip which message is visible */
+.auth.is-signup .overlay__panel--right{ opacity: 0; }
+.auth.is-signup .overlay__panel--left { opacity: 1; transform: translateX(0); }
+
+/* Nice inner ring */
+.auth::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 0 1px rgba(26, 28, 44, .03);
+  pointer-events: none;
+}
+
+/* Responsive: stack vertically for narrow screens */
+@media (max-width: 860px){
+  .auth{ height: 680px; }
+  .form-pane{ width: 100%; padding: 32px 24px; }
+  .form-pane--signup{ transform: translateY(8px); }
+  .overlay{
+    width: 100%;
+    height: 50%;
+    left: 0;
+    top: 50%;
+    transform: translateY(0);
+    border-radius: 220px 0 0 220px / 100px 0 0 100px;
+  }
+  .auth.is-signup .overlay{
+    top: 0;
+    transform: translateY(0);
+    border-radius: 0 220px 220px 0 / 0 100px 100px 0;
+  }
+  .overlay__panel--left, .overlay__panel--right{ transform: translateX(0); }
+  .overlay__panel--right{ opacity: 0; }
+  .auth:not(.is-signup) .overlay__panel--right{ opacity: 1; }
+  .auth.is-signup .overlay__panel--left{ opacity: 1; }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .auth *, .overlay{
+    transition: none !important;
+    animation: none !important;
+  }
+}
